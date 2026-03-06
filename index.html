@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사내 컴플라이언스 퀴즈 통합본</title>
+    <style>
+        /* [표준 가이드] 배경 및 레이아웃 */
+        body { 
+            font-family: 'Pretendard', -apple-system, sans-serif; 
+            background-color: #f2f9f2; 
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: 0; color: #333;
+        }
+
+        .container { 
+            max-width: 650px; width: 95%; background: white; 
+            padding: 40px; border-radius: 30px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06); text-align: center;
+            margin: 20px 0;
+        }
+
+        /* 진행 바 */
+        .progress-container {
+            width: 100%; height: 6px; background: #eee;
+            border-radius: 10px; margin-bottom: 30px; display: none;
+        }
+        .progress-bar {
+            width: 0%; height: 100%; background: #78a878;
+            border-radius: 10px; transition: width 0.3s ease;
+        }
+
+        .event-tag { text-align: left; color: #78a878; font-weight: bold; margin-bottom: 20px; }
+        .main-title { font-size: 2.2rem; color: #2c3e50; margin-bottom: 60px; line-height: 1.4; font-weight: 800; }
+        
+        /* 버튼 스타일 */
+        .start-btn, .link-btn, .next-btn, .prev-btn { 
+            border: none; padding: 18px 25px; 
+            font-size: 1.1rem; font-weight: bold; border-radius: 50px; 
+            cursor: pointer; transition: all 0.2s;
+            text-decoration: none; display: inline-block;
+        }
+        .start-btn { background: #3498db; color: white; box-shadow: 0 5px 0 #2980b9; padding: 20px 70px; }
+        
+        /* 하단 네비게이션 버튼 그룹 (나란히 배치) */
+        .nav-btn-group { 
+            display: none; /* 정답 체크 전에는 숨김 */
+            justify-content: center; gap: 12px; margin-top: 25px; 
+        }
+        
+        .prev-btn { background: #95a5a6; color: white; box-shadow: 0 5px 0 #7f8c8d; }
+        .next-btn { background: #62b565; color: white; box-shadow: 0 5px 0 #4a8d4c; }
+        .link-btn { background: #3498db; color: white; box-shadow: 0 5px 0 #2980b9; padding: 20px 40px; }
+
+        .start-btn:active, .next-btn:active, .prev-btn:active, .link-btn:active { transform: translateY(4px); box-shadow: none; }
+
+        /* 섹션 제어 */
+        .content-section { display: none; }
+        .quiz-header { font-size: 1.4rem; font-weight: bold; margin-bottom: 25px; color: #34495e; border-bottom: 2px solid #f2f9f2; padding-bottom: 10px; }
+        .comic-frame { width: 100%; border-radius: 15px; overflow: hidden; margin-bottom: 25px; border: 1px solid #eee; background: #fafafa; }
+        .comic-img { width: 100%; height: auto; display: block; }
+        .question { font-size: 1.25rem; font-weight: bold; margin-bottom: 30px; line-height: 1.6; }
+
+        .btn-box { display: flex; gap: 15px; justify-content: center; }
+        .ans-btn { flex: 1; padding: 20px; font-size: 1.4rem; border: none; border-radius: 15px; cursor: pointer; color: white; font-weight: bold; transition: 0.2s; }
+        .btn-o { background: #5dade2; box-shadow: 0 5px 0 #3498db; }
+        .btn-x { background: #ff7675; box-shadow: 0 5px 0 #d63031; }
+
+        .answer-box { display: none; margin-top: 25px; padding: 20px; border-radius: 15px; text-align: left; line-height: 1.7; animation: fadeIn 0.4s; }
+        .code-highlight { color: #007bff; font-size: 2.5rem; font-weight: 900; margin: 20px 0; display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="progress-container" id="prog-wrap"><div class="progress-bar" id="prog-bar"></div></div>
+
+    <section id="intro-page" class="content-section" style="display: block;">
+        <div class="event-tag">2nd Compliance Event</div>
+        <h1 class="main-title">동료들이 실제로 고민했던<br>OX 테스트</h1>
+        <button type="button" class="start-btn" onclick="navTo('ep1-page', 1)">START</button>
+    </section>
+
+    <section id="ep1-page" class="content-section">
+        <div class="quiz-header">⚖️ 1번: 부수입이 발생하는 외부 강의 요청</div>
+        <div class="comic-frame"><img src="KR_1.png" class="comic-img"></div>
+        <p class="question">김프로의 말처럼, 회사 허가를 받으면 강의료 등의 부수입이 발생하는<br> 외부 강의 요청을 받아들여도 될까요?</p>
+        <div class="btn-box">
+            <button class="ans-btn btn-o" onclick="checkAnswer(1, true)">O</button>
+            <button class="ans-btn btn-x" onclick="checkAnswer(1, false)">X</button>
+        </div>
+        <div id="ans-1" class="answer-box"></div>
+        <div id="nav-1" class="nav-btn-group">
+            <button class="next-btn" onclick="navTo('ep2-page', 2)">다음 2번 문제 풀기 ➔</button>
+        </div>
+    </section>
+
+    <section id="ep2-page" class="content-section">
+        <div class="quiz-header">⚖️ 2번: 해외에서의 한국 협력사에게 기술자료 요청</div>
+        <div class="comic-frame"><img src="KR_2.png" class="comic-img"></div>
+        <p class="question">해외 현장에서 한국 협력사와 거래시, 한국 하도급법을 적용해야 할까요?</p>
+        <div class="btn-box">
+            <button class="ans-btn btn-o" onclick="checkAnswer(2, true)">O</button>
+            <button class="ans-btn btn-x" onclick="checkAnswer(2, false)">X</button>
+        </div>
+        <div id="ans-2" class="answer-box"></div>
+        <div id="nav-2" class="nav-btn-group">
+            <button class="prev-btn" onclick="navTo('ep1-page', 1)">◀ 이전 문제</button>
+            <button class="next-btn" onclick="navTo('ep3-page', 3)">다음 3번 문제 풀기 ➔</button>
+        </div>
+    </section>
+
+    <section id="ep3-page" class="content-section">
+        <div class="quiz-header">⚖️ 3번: 발주처의 경쟁사 자료 검토 요청</div>
+        <div class="comic-frame"><img src="KR_3.png" class="comic-img"></div>
+        <p class="question">발주처가 경쟁사의 기술 자료 검토를 요청한다면, 수락해도 될까요?</p>
+        <div class="btn-box">
+            <button class="ans-btn btn-o" onclick="checkAnswer(3, false)">O</button>
+            <button class="ans-btn btn-x" onclick="checkAnswer(3, true)">X</button>
+        </div>
+        <div id="ans-3" class="answer-box"></div>
+        <div id="nav-3" class="nav-btn-group">
+            <button class="prev-btn" onclick="navTo('ep2-page', 2)">◀ 이전 문제</button>
+            <button class="next-btn" onclick="navTo('ep4-page', 4)">다음 4번 문제 풀기 ➔</button>
+        </div>
+    </section>
+
+    <section id="ep4-page" class="content-section">
+        <div class="quiz-header">⚖️ 4번: 해외 PJT 관련 국내 경쟁사와의 미팅</div>
+        <div class="comic-frame"><img src="KR_4.png" class="comic-img"></div>
+        <p class="question">해외 프로젝트 입찰 시 국내 경쟁사와 정보 교환을 해도 괜찮을까요?</p>
+        <div class="btn-box">
+            <button class="ans-btn btn-o" onclick="checkAnswer(4, false)">O</button>
+            <button class="ans-btn btn-x" onclick="checkAnswer(4, true)">X</button>
+        </div>
+        <div id="ans-4" class="answer-box"></div>
+        <div id="nav-4" class="nav-btn-group">
+            <button class="prev-btn" onclick="navTo('ep3-page', 3)">◀ 이전 문제</button>
+            <button class="next-btn" onclick="navTo('ep5-page', 5)">다음 5번 문제 풀기 ➔</button>
+        </div>
+    </section>
+
+    <section id="ep5-page" class="content-section">
+        <div class="quiz-header">⚖️ 5번: 결혼예정 동료의 부친이 공무원인 경우 축의금 액수</div>
+        <div class="comic-frame"><img src="KR_5.png" class="comic-img"></div>
+        <p class="question">결혼하는 동료의 아버지가 공직자라면, 청탁금지법 적용 대상일까요?</p>
+        <div class="btn-box">
+            <button class="ans-btn btn-o" onclick="checkAnswer(5, false)">O</button>
+            <button class="ans-btn btn-x" onclick="checkAnswer(5, true)">X</button>
+        </div>
+        <div id="ans-5" class="answer-box"></div>
+        <div id="nav-5" class="nav-btn-group">
+            <button class="prev-btn" onclick="navTo('ep4-page', 4)">◀ 이전 문제</button>
+            <button class="next-btn" onclick="navTo('ep6-page', 6)">다음 6번 문제 풀기 ➔</button>
+        </div>
+    </section>
+
+    <section id="ep6-page" class="content-section">
+        <div class="quiz-header">⚖️ 6번: 회사 명함 제공 요청</div>
+        <div class="comic-frame"><img src="KR_6.png" class="comic-img"></div>
+        <p class="question">외부 Agent에게 우리 회사 로고 명함을 만들어 줘도 될까요?</p>
+        <div class="btn-box">
+            <button class="ans-btn btn-o" onclick="checkAnswer(6, false)">O</button>
+            <button class="ans-btn btn-x" onclick="checkAnswer(6, true)">X</button>
+        </div>
+        <div id="ans-6" class="answer-box"></div>
+        <div id="nav-6" class="nav-btn-group">
+            <button class="prev-btn" onclick="navTo('ep5-page', 5)">◀ 이전 문제</button>
+            <button class="next-btn" onclick="navTo('outro-page', 7)">결과 확인하러 가기 ➔</button>
+        </div>
+    </section>
+
+    <section id="outro-page" class="content-section">
+        <div class="event-tag">Finish</div>
+        <div style="font-size:1.2rem; line-height:1.8; margin-bottom:40px;">
+            여러분들의 동료가 고민했던 내용들 같이 확인해주셔서 감사합니다.<br>
+            앞으로 회사 업무에 도움이 되길 바랍니다. 수고하셨습니다.
+        </div>
+        <div>이벤트 참여인증 코드는 <span class="code-highlight">777</span> 입니다.</div>
+        <div class="nav-btn-group" style="display: flex;">
+            <button class="prev-btn" onclick="navTo('ep6-page', 6)">◀ 마지막 문제로</button>
+            <a href="http://seccep.secc.samsung.co.kr:84/secc/survey/surveyAnswerLogin.do?surid=PQSaViLL/6yVEXSRsmgF2fFzqpe0rupFYTt07lLxd+0=" target="_blank" class="link-btn">이벤트 참여인증 코드<br> 입력하러 가기</a>
+        </div>
+    </section>
+</div>
+
+<script>
+    const totalSteps = 6; // 7에서 6으로 변경
+
+    // 네비게이션 함수
+    function navTo(targetId, step) {
+        const sections = document.querySelectorAll('.content-section');
+        sections.forEach(s => s.style.display = 'none');
+        const target = document.getElementById(targetId);
+        if (target) target.style.display = 'block';
+
+        const progWrap = document.getElementById('prog-wrap');
+        const progBar = document.getElementById('prog-bar');
+        if(step >= 1 && step <= totalSteps) {
+            progWrap.style.display = 'block';
+            progBar.style.width = (step / totalSteps * 100) + '%';
+        } else {
+            progWrap.style.display = 'none';
+        }
+        window.scrollTo(0,0);
+    }
+
+    // 정답 체크 함수
+    function checkAnswer(num, isCorrect) {
+        const box = document.getElementById('ans-' + num);
+        const navGroup = document.getElementById('nav-' + num);
+        
+        // 피드백 데이터 (순서 1~6에 맞게 매핑)
+        const feedback = {
+            1: ["✅ 정답! <span style='color: red;'>강의 내용 및 자문료 수취 등에 관해 회사의 허가를 득한다면 가능합니다.</span><br> 회사의 취업규칙과 임직원 가이드라인 준수, 그리고 강의 내용중에 회사의 기밀등이<br> 포함되지 않는 것이 요구됩니다. 취업규칙에 의하면, 직원은 직무상의 기밀을 엄수하고<br> 회사의 기밀이 누설되지 아니하도록 각별히 유의하여야 하고, 회사의 허가없이 사무 이외의<br> 다른 직무를 겸하거나 영리사업에 종사하지 않을 의무가 있으며 이를 위반할 경우 징계에<br> 처하게 될수 있습니다. 또한 임직원 가이드라인에 의하면, 거래관계에 있거나 거래를<br> 희망하는 업체로부터 '부당하게' 재산상의 이득을 취하는 모든 행위는 금지되니 이점도<br> 참고하여야 합니다.", "❌ 오답! 사내기준을 준수하고 회사의 허가를 득하면 가능합니다.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(정답인 O를 클릭해보세요)"],
+            2: ["✅ 정답! <span style='color: red;'>해외에서 이루어지는 PJT라고 하더라도, 수급사업자가 한국 업체로서 하도급법<br> 적용을 받는 협력사인 경우에는 한국 하도급법을 적용받게 됩니다.</span><br> 따라서, 이 경우에는 한국의 하도급법이 적용되므로, 정당한 사유없는 기술자료 제공 요구<br> 행위 금지와 필요시 서면 교부 및 비밀유지계약 체결 등 각종 규제사항을 준수해야 합니다.<br> 하지만 만약, 수급사업자가 외국법에 근거하여 설립된 회사인 경우에는 하도급법이 적용되지<br> 않습니다. 다만, 형식적으로거래 당사자가 국외법인들인 것처럼 외형을 갖추었으나,<br> 실제로는 주요 계약사항을 교섭하고 계약을 이행하는 주체가 국내법인들인 경우는 한국의<br> 하도급법이 적용될수 있음에 유의해야 합니다. <br> 마지막으로 해당 해외 국가의 법률에 따른 규제에 관하여는 별도 확인이 필요합니다.", "❌ 틀렸습니다! 이 경우에는 국내 하도급법이 적용됩니다.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (정답인 O를 클릭해보세요)"],
+            3: ["✅ 정답! 경쟁사 자료 검토는 위험합니다.<br>입찰절차가 개시된 상태에서, 입찰에 참여한 경쟁업체의 문건을 당사가 검토하는 것은,<br> <span style='color: red;'>경쟁업체가 이를 동의한 사실이 없는 한 경쟁업체에 대한 영업비밀 침해 행위에 해당될<br> 우려가 있습니다.</span> 경쟁업체의 동의가 있는 것이 아니라면, 설령 발주처가 제공해준 것이라고<br> 하더라도, 경쟁업체의 의사에 반하는 상황으로서 영업밀 침해 이슈가 발생할 수 있습니다.<br> 아울러, 해당 문건이 경쟁업체의 영업비밀로 판단될 경우에는 설령 당사가 검토에는<br> 나아가지 않았더라도 해당 문건을 건너받은 자체만으로도 문제가 될 수 있으므로 각별한<br> 주의가 필요합니다.", "❌ 틀렸습니다! 수락하면 안됩니다.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (정답인 X를 클릭해보세요)"],
+            4: ["✅ 정답! <span style='color: red;'>담합으로 비춰질수 있는 경쟁사와의 접촉은 안됩니다.</span><br> 기본적으로 담합을 금지하는 것은 국내법에 국한되는 것이 아니라 전 세계 대부분의<br> 국가에서 이를 금지하고 있습니다. 따라서 해외 프로젝트 입찰이라고 하더라도 이를 국내와<br> 다르게 판단할 필요는 없습니다. 최근에는 정보교환 만으로도 담합으로 규제받는 법 집행<br> 사례도 있습니다. <br> 또한, 담합을 위한 경쟁사 접촉은 신고 대상이 아니라 절대 불가합니다. 그렇지만 경쟁사와의<br> 담합의 목적이 없는 연락이나 미팅까지 무조건 금지되는 것이 아니므로, 이와 관련한 사내<br> 컴플라이언스 기준을 준수하면 경쟁사와의 미팅은 가능합니다. (경쟁사 접촉 신고)", "❌ 틀렸습니다! 담합으로 비춰질수 있는 경쟁사와의 접촉은 안됩니다.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(정답인 X를 클릭해보세요)"],
+            5: ["✅ 정답! 이 경우에는 청탁금지법이 적용되지 않습니다.<br> <span style='color: red;'>한국의 청탁금지법은 공직자 본인 또는 그 배우자가 받는 금품을 규제하기 때문입니다.</span><br> 이 경우에는 결혼하는 동료 본인이 공직자가 아니기에 청탁금지법 적용 대상이 아니며,<br> 따라서 5만원 이상의 축의금을 줘도 괜찮습니다. 그렇지만 만약에 동료가 공직자 또는<br> 공직자의 배우자라면 청탁금지법의 적용을 받고, 이 때에는 시행령에 정해진 경조사비<br> 가액 범위를 준수해야 합니다. (경조사비 5만원 이하) 더 나아가 청탁금지법 대상자와<br> 인허가, 조사, 수사 등 직접적 이해관계가 있으면, 일체의 금품제공이 금지됩니다.", "❌ 틀렸습니다! 이 경우는 청탁금지법 대상이 아닙니다.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (정답인 X를 클릭해보세요)"],
+            6: ["✅ 정답! Agent에게 당사의 명함을 사용하도록 하거나 당사와의 관련성을 나타내는 표식을<br> 제공하는 것은 적절하지 않습니다.<br> 이는, <span style='color: red;'>Agent의 법 위반 발생시 그 책임이 당사에게 확장되는 증거로 작용할 우려가 있기<br> 때문입니다.</span> 만일 법 위반 이슈가 현실화 된 때에는 해당 Agent가 당사가 제공한 표식을<br> 사용한 사실은 그러한 법 위반 행위가 해당 Agent의 독자적 판단에 의한 것이 아니라 당사의<br> 지시 등이 개입되어 이루어 진것으로 오인하게 하는 정황으로 작용할 우려가 있습니다.<br> 만약 현업에서 이와 관련한 애로사항이 발생한다면, 사전에 법무팀 등 유관부서와 확인이<br> 필요합니다.", "❌ 틀렸습니다! 당사의 명함을 만들어주는 것은 적절하지 않습니다.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; (정답인 X를 클릭해보세요)"]
+        };
+
+        const [correctMsg, wrongMsg] = feedback[num];
+        box.style.display = 'block';
+        box.style.background = isCorrect ? "#ebfbee" : "#fff5f5";
+        box.style.border = "2px solid " + (isCorrect ? "#4caf50" : "#f44336");
+        box.innerHTML = `<strong>${isCorrect ? correctMsg : wrongMsg}</strong>`;
+        
+        if(navGroup) navGroup.style.display = 'flex';
+        box.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+</body>
+</html>
